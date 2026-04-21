@@ -1,0 +1,40 @@
+<configuration>
+	<property>
+		<name>fs.defaultFS</name>
+		<value>hdfs://master:9000</value>
+	</property>
+
+	<property>
+		<name>hadoop.tmp.dir</name>
+		<value>/export/data/hadoop/tmp</value>
+	</property>
+
+  <property>
+    <name>hadoop.http.staticuser.user</name>
+    <value>hadoop</value>
+  </property>
+
+	<property>
+		<name>hadoop.proxyuser.hadoop.hosts</name>
+		<value>*</value>
+	</property>
+
+	<!--配置atguigu用户能够代理的用户组为任意组-->
+	<property>
+		<name>hadoop.proxyuser.hadoop.groups</name>
+		<value>*</value>
+	</property>
+
+	<!--配置atguigu用户能够代理的用户为任意用户-->
+	<property>
+	   <name>hadoop.proxyuser.hadoop.hosts</name>
+		<value>*</value>
+	</property>
+
+
+<property>
+        <name>ipc.client.max.response.size</name>
+        <value>104857600</value> <!-- 例如设置为100MB -->
+    </property>
+
+</configuration>

@@ -1,0 +1,24 @@
+<configuration>
+
+	<property>
+	<name>dfs.namenode.name.dir</name>
+	<value>/export/data/hadoop/tmp/dfs/name</value>
+	</property>
+
+	<property>
+	<name>dfs.datanode.data.dir</name>
+	<value>/export/data/hadoop/tmp/dfs/data</value>
+	</property>
+
+	<property>
+	<name>dfs.namenode.http-address</name>
+	<value>master:9870</value>
+	</property>
+
+	<property>
+	<name>dfs.namenode.secondary.http-address</name>
+	<value>slave02:9868</value>
+	</property>
+
+
+</configuration>
