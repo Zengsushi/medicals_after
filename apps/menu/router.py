@@ -17,14 +17,13 @@ from apps.core.database import get_db
 from apps.core import Result
 from utils.auth_helpers import require_auth, get_client_info
 
-
 router = APIRouter(prefix="/api", tags=["menus"])
 
 
 @router.get("/menus", summary="获取用户菜单树")
 async def get_user_menus(
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """
     获取当前用户的菜单树
@@ -40,8 +39,8 @@ async def get_user_menus(
 
 @router.get("/menus/tree", summary="获取完整菜单树(管理)")
 async def get_full_menu_tree(
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """
     获取完整菜单树 (管理用，包括禁用的菜单)
@@ -56,8 +55,8 @@ async def get_full_menu_tree(
 
 @router.get("/menus/permissions/all", summary="获取所有权限列表")
 async def get_all_permissions(
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """
     获取所有权限列表（用于菜单管理中的权限选择）
@@ -84,9 +83,9 @@ async def get_all_permissions(
 
 @router.get("/menus/{menu_id}", summary="获取菜单详情")
 async def get_menu_detail(
-    menu_id: int,
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        menu_id: int,
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """获取菜单详情"""
     if not current_user.has_permission('menu:view') and not current_user.has_permission('admin:view'):
@@ -96,16 +95,16 @@ async def get_menu_detail(
     if not menu:
         return Result.error(404, "菜单不存在")
 
-    return Result.success(200, "菜单详情获取成功", 
-                         MenuService.menu_to_dict(menu, include_children=False))
+    return Result.success(200, "菜单详情获取成功",
+                          MenuService.menu_to_dict(menu, include_children=False))
 
 
 @router.post("/menus", summary="创建菜单")
 async def create_menu(
-    request: Request,
-    menu_data: MenuCreateRequest,
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        request: Request,
+        menu_data: MenuCreateRequest,
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """
     创建新菜单
@@ -150,8 +149,8 @@ async def create_menu(
             ip_address=client_info["ip_address"]
         )
 
-        return Result.success(200, "菜单创建成功", 
-                             MenuService.menu_to_dict(menu, include_children=False))
+        return Result.success(200, "菜单创建成功",
+                              MenuService.menu_to_dict(menu, include_children=False))
     except Exception as e:
         logging.error(f"创建菜单失败: {e}")
         return Result.error(500, str(e))
@@ -159,11 +158,11 @@ async def create_menu(
 
 @router.patch("/menus/{menu_id}", summary="更新菜单")
 async def update_menu(
-    request: Request,
-    menu_id: int,
-    menu_data: MenuUpdateRequest,
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        request: Request,
+        menu_id: int,
+        menu_data: MenuUpdateRequest,
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """
     更新菜单
@@ -196,8 +195,8 @@ async def update_menu(
             ip_address=client_info["ip_address"]
         )
 
-        return Result.success(200, "菜单更新成功", 
-                             MenuService.menu_to_dict(menu, include_children=False))
+        return Result.success(200, "菜单更新成功",
+                              MenuService.menu_to_dict(menu, include_children=False))
     except Exception as e:
         logging.error(f"更新菜单失败: {e}")
         return Result.error(500, str(e))
@@ -205,10 +204,10 @@ async def update_menu(
 
 @router.patch("/menus/{menu_id}/toggle", summary="启用/禁用菜单")
 async def toggle_menu(
-    request: Request,
-    menu_id: int,
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        request: Request,
+        menu_id: int,
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """
     启用/禁用菜单
@@ -240,8 +239,8 @@ async def toggle_menu(
             ip_address=client_info["ip_address"]
         )
 
-        return Result.success(200, f"菜单{action_text}成功", 
-                             MenuService.menu_to_dict(menu, include_children=False))
+        return Result.success(200, f"菜单{action_text}成功",
+                              MenuService.menu_to_dict(menu, include_children=False))
     except Exception as e:
         logging.error(f"切换菜单状态失败: {e}")
         return Result.error(500, str(e))
@@ -249,10 +248,10 @@ async def toggle_menu(
 
 @router.delete("/menus/{menu_id}", summary="删除菜单")
 async def delete_menu(
-    request: Request,
-    menu_id: int,
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        request: Request,
+        menu_id: int,
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """
     删除菜单 (递归删除子菜单)
@@ -283,8 +282,8 @@ async def delete_menu(
             ip_address=client_info["ip_address"]
         )
 
-        return Result.success(200, f"菜单删除成功 (共删除 {len(all_ids)} 个)", 
-                             {"deleted_count": len(all_ids)})
+        return Result.success(200, f"菜单删除成功 (共删除 {len(all_ids)} 个)",
+                              {"deleted_count": len(all_ids)})
     except Exception as e:
         logging.error(f"删除菜单失败: {e}")
         return Result.error(500, str(e))
@@ -292,6 +291,7 @@ async def delete_menu(
 
 from pydantic import BaseModel, Field
 from typing import Optional
+
 
 class BatchUpdateRequest(BaseModel):
     menu_ids: List[int]
@@ -302,12 +302,13 @@ class BatchUpdateRequest(BaseModel):
     permission_code: Optional[str] = None
     parent_id: Optional[int] = None
 
+
 @router.patch("/menus/batch", summary="批量更新菜单")
 async def batch_update_menus(
-    request: Request,
-    batch_data: BatchUpdateRequest,
-    current_user: User = Depends(require_auth()),
-    db: Session = Depends(get_db)
+        request: Request,
+        batch_data: BatchUpdateRequest,
+        current_user: User = Depends(require_auth()),
+        db: Session = Depends(get_db)
 ):
     """
     批量更新菜单
@@ -339,10 +340,10 @@ async def batch_update_menus(
         # 使用 model_fields_set 检查字段是否被显式设置
         if 'parent_id' in batch_data.model_fields_set:
             update_data['parent_id'] = batch_data.parent_id
-        
+
         if not update_data:
             return Result.error(400, "请提供要更新的数据")
-        
+
         # 批量更新菜单
         try:
             updated_count = MenuService.batch_update_menus(db, menu_ids, update_data)
@@ -359,8 +360,8 @@ async def batch_update_menus(
             ip_address=client_info["ip_address"]
         )
 
-        return Result.success(200, f"批量更新成功，共更新 {updated_count} 个菜单", 
-                             {"updated_count": updated_count})
+        return Result.success(200, f"批量更新成功，共更新 {updated_count} 个菜单",
+                              {"updated_count": updated_count})
     except Exception as e:
         logging.error(f"批量更新菜单失败: {e}")
         return Result.error(500, str(e))

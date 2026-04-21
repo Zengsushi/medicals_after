@@ -434,26 +434,18 @@ async def get_doctor_ranking(
         dt: str = Query(None, description="日期分区（YYYYMMDD）"),
         rankType: str = Query("consultation", description="排名类型: consultation-就诊量, satisfaction-满意度"),
         page: int = Query(1, description="页码", ge=1),
-        pageSize: int = Query(10, description="每页数量", ge=1, le=100)
+        pageSize: int = Query(10, description="每页数量", ge=1, le=100),
+        db: Session = Depends(get_db)
 ):
     """获取医生排名数据"""
     try:
-        spark = init_spark_connect_hive()
-        spark.sql("USE medicals.ads")
-        
-        if not dt:
-            max_dt_df = spark.sql("SELECT MAX(dt) as max_dt FROM ads_disease_analysis WHERE dt IS NOT NULL")
-            dt_row = max_dt_df.collect()
-            dt = dt_row[0]["max_dt"] if dt_row and dt_row[0]["max_dt"] else ""
-        
-        where_clause = f"WHERE dt = '{dt}'" if dt else ""
-        
+        # 使用 MySQL 替代 Spark 查询
         if rankType == "satisfaction":
             order_field = "recommendation_star"
         else:
             order_field = "consultation_count"
         
-        sql = f"""
+        query = text(f"""
             SELECT 
                 doctor_id,
                 doctor_name,
@@ -461,48 +453,40 @@ async def get_doctor_ranking(
                 department,
                 hospital_name,
                 city,
-                CAST(consultation_count AS BIGINT) as consultation_count,
+                consultation_count,
                 consultation_price,
                 recommendation_star,
                 doctor_response_rate,
                 avg_interactions
-            FROM (
-                SELECT *,
-                    ROW_NUMBER() OVER (ORDER BY {order_field} DESC) as ranking
-                FROM ads_disease_analysis 
-                {where_clause}
-            ) ranked
+            FROM ads_doctor_ranking
             ORDER BY {order_field} DESC
-            LIMIT {pageSize} OFFSET {(page - 1) * pageSize}
-        """
+            LIMIT :limit OFFSET :offset
+        """)
         
-        df = spark.sql(sql)
-        rows = df.collect()
-        spark.stop()
+        result = db.execute(query, {"limit": pageSize, "offset": (page - 1) * pageSize})
+        rows = result.fetchall()
         
         data_list = []
         for idx, row in enumerate(rows):
             data_list.append({
                 "ranking": (page - 1) * pageSize + idx + 1,
-                "doctor_id": row["doctor_id"],
-                "doctor_name": row["doctor_name"],
-                "doctor_title": row["doctor_title"],
-                "department": row["department"],
-                "hospital_name": row["hospital_name"],
-                "city": row["city"],
-                "consultation_count": row["consultation_count"],
-                "consultation_price": float(row["consultation_price"]) if row["consultation_price"] else 0,
-                "recommendation_star": float(row["recommendation_star"]) if row["recommendation_star"] else 0,
-                "doctor_response_rate": float(row["doctor_response_rate"]) if row["doctor_response_rate"] else 0,
-                "avg_interactions": float(row["avg_interactions"]) if row["avg_interactions"] else 0,
+                "doctor_id": row[0],
+                "doctor_name": row[1],
+                "doctor_title": row[2],
+                "department": row[3],
+                "hospital_name": row[4],
+                "city": row[5],
+                "consultation_count": int(row[6]) if row[6] else 0,
+                "consultation_price": float(row[7]) if row[7] else 0,
+                "recommendation_star": float(row[8]) if row[8] else 0,
+                "doctor_response_rate": float(row[9]) if row[9] else 0,
+                "avg_interactions": float(row[10]) if row[10] else 0,
                 "rank_type": rankType
             })
         
         return Result.success(200, "医生排名数据获取成功", {"list": data_list, "total": len(data_list)})
     except Exception as e:
         logging.error(f"获取医生排名数据失败: {e}")
-        import traceback
-        traceback.print_exc()
         data_list = _get_mock_doctor_ranking(rankType, pageSize)
         return Result.success(200, "医生排名数据获取成功（模拟数据）", {"list": data_list, "total": len(data_list)})
 

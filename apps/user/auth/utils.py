@@ -28,8 +28,8 @@ JWT_ALGORITHM = "HS256"
 JWT_ISSUER = os.getenv("JWT_ISSUER", "medical-data-system")
 JWT_AUDIENCE = os.getenv("JWT_AUDIENCE", "medical-data-api")
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
 
 
 def generate_jti() -> str:
