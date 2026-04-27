@@ -1,2 +1,9 @@
 test/pyspark/metastore_db/seg0/c281.dat
 *.dat
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.env
+metastore_db/
+.idea/

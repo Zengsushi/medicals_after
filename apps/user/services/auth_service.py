@@ -36,19 +36,19 @@ class AuditService:
 
     @staticmethod
     def log(
-        db: Session,
-        action: str,
-        user_id: int = None,
-        username: str = None,
-        resource: str = None,
-        resource_id: str = None,
-        description: str = None,
-        ip_address: str = None,
-        user_agent: str = None,
-        device_fingerprint: str = None,
-        status: str = "success",
-        error_message: str = None,
-        request_data: dict = None
+            db: Session,
+            action: str,
+            user_id: int = None,
+            username: str = None,
+            resource: str = None,
+            resource_id: str = None,
+            description: str = None,
+            ip_address: str = None,
+            user_agent: str = None,
+            device_fingerprint: str = None,
+            status: str = "success",
+            error_message: str = None,
+            request_data: dict = None
     ):
         """记录审计日志"""
         try:
@@ -77,12 +77,12 @@ class SessionService:
 
     @staticmethod
     def create_session(
-        db: Session,
-        user: User,
-        device_fingerprint: str,
-        ip_address: str,
-        user_agent: str = None,
-        login_location: str = None
+            db: Session,
+            user: User,
+            device_fingerprint: str,
+            ip_address: str,
+            user_agent: str = None,
+            login_location: str = None
     ) -> DeviceSession:
         """创建设备会话"""
         jti = generate_jti()
@@ -169,7 +169,8 @@ class SessionService:
         return count
 
     @staticmethod
-    def enforce_max_sessions(db: Session, user_id: int, max_sessions: int = MAX_CONCURRENT_SESSIONS) -> Optional[DeviceSession]:
+    def enforce_max_sessions(db: Session, user_id: int, max_sessions: int = MAX_CONCURRENT_SESSIONS) -> Optional[
+        DeviceSession]:
         """强制最大会话数限制，踢出最早的会话"""
         sessions = SessionService.get_user_sessions(db, user_id)
 
@@ -194,12 +195,12 @@ class AuthService:
 
     @staticmethod
     def login(
-        db: Session,
-        username: str,
-        password: str,
-        ip_address: str,
-        user_agent: str = None,
-        device_fingerprint: str = None
+            db: Session,
+            username: str,
+            password: str,
+            ip_address: str,
+            user_agent: str = None,
+            device_fingerprint: str = None
     ) -> Dict[str, Any]:
         """
         用户登录
@@ -366,10 +367,10 @@ class AuthService:
 
     @staticmethod
     def refresh(
-        db: Session,
-        refresh_token: str,
-        ip_address: str,
-        user_agent: str = None
+            db: Session,
+            refresh_token: str,
+            ip_address: str,
+            user_agent: str = None
     ) -> Dict[str, Any]:
         """
         刷新令牌 (Refresh Token Rotation)
@@ -456,7 +457,7 @@ class AuthService:
             user_response = AuthService._build_user_response(user)
             menus_response = AuthService._build_menus_response(user)
             permissions_response = user.get_permissions()
-            
+
             primary_role_obj = user.get_primary_role()
             role_response = primary_role_obj.code if primary_role_obj else "guest"
 
@@ -479,12 +480,12 @@ class AuthService:
 
     @staticmethod
     def logout(
-        db: Session,
-        user_id: int,
-        jti: str = None,
-        revoke_all: bool = False,
-        ip_address: str = None,
-        user_agent: str = None
+            db: Session,
+            user_id: int,
+            jti: str = None,
+            revoke_all: bool = False,
+            ip_address: str = None,
+            user_agent: str = None
     ) -> Dict[str, Any]:
         """
         用户登出
@@ -649,10 +650,10 @@ class PasswordService:
 
     @staticmethod
     def reset_password(
-        db: Session,
-        token: str,
-        new_password: str,
-        ip_address: str
+            db: Session,
+            token: str,
+            new_password: str,
+            ip_address: str
     ) -> Dict[str, Any]:
         """
         重置密码
@@ -698,10 +699,10 @@ class PasswordService:
 
     @staticmethod
     def create_password_reset_token(
-        db: Session,
-        username: str,
-        email: str,
-        ip_address: str
+            db: Session,
+            username: str,
+            email: str,
+            ip_address: str
     ) -> Dict[str, Any]:
         """
         创建密码重置令牌

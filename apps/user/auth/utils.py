@@ -38,10 +38,10 @@ def generate_jti() -> str:
 
 
 def generate_device_fingerprint(
-    user_agent: str = None,
-    accept_language: str = None,
-    screen: str = None,
-    ip_address: str = None
+        user_agent: str = None,
+        accept_language: str = None,
+        screen: str = None,
+        ip_address: str = None
 ) -> str:
     """生成设备指纹"""
     parts = [
@@ -59,7 +59,7 @@ def extract_device_info(user_agent: str = None, accept_language: str = None) -> 
     """提取设备信息"""
     if not user_agent:
         return {"browser": "unknown", "os": "unknown", "device": "unknown"}
-    
+
     browser = "Unknown"
     if "Chrome" in user_agent:
         browser = "Chrome"
@@ -69,7 +69,7 @@ def extract_device_info(user_agent: str = None, accept_language: str = None) -> 
         browser = "Safari"
     elif "Edge" in user_agent:
         browser = "Edge"
-    
+
     os = "Unknown"
     if "Windows" in user_agent:
         os = "Windows"
@@ -81,11 +81,11 @@ def extract_device_info(user_agent: str = None, accept_language: str = None) -> 
         os = "Android"
     elif "iPhone" in user_agent:
         os = "iOS"
-    
+
     device = "Desktop"
     if "Mobile" in user_agent or "Android" in user_agent or "iPhone" in user_agent:
         device = "Mobile"
-    
+
     return {"browser": browser, "os": os, "device": device}
 
 
@@ -129,13 +129,13 @@ def simple_decode(token: str, secret: str) -> Optional[Dict]:
 
 
 def create_access_token(
-    user_id: int = None,
-    username: str = None,
-    jti: str = None,
-    device_fingerprint: str = None,
-    role: str = None,
-    expires_delta: timedelta = None,
-    additional_claims: Dict[str, Any] = None
+        user_id: int = None,
+        username: str = None,
+        jti: str = None,
+        device_fingerprint: str = None,
+        role: str = None,
+        expires_delta: timedelta = None,
+        additional_claims: Dict[str, Any] = None
 ) -> Tuple[str, dict]:
     """创建访问令牌"""
     data = {}
@@ -152,7 +152,7 @@ def create_access_token(
         data["role"] = role
     if additional_claims:
         data.update(additional_claims)
-    
+
     if jwt:
         try:
             to_encode = data.copy()
@@ -165,20 +165,20 @@ def create_access_token(
             return encoded_jwt, to_encode
         except Exception:
             pass
-    
+
     return simple_encode(data, JWT_SECRET_KEY), data
 
 
 def create_refresh_token(
-    user_id: int = None,
-    username: str = None,
-    device_fingerprint: str = None,
-    expires_delta: timedelta = None,
-    additional_claims: Dict[str, Any] = None
+        user_id: int = None,
+        username: str = None,
+        device_fingerprint: str = None,
+        expires_delta: timedelta = None,
+        additional_claims: Dict[str, Any] = None
 ) -> Tuple[str, str, datetime]:
     """创建刷新令牌 - 返回(token, jti, expire)"""
     jti = generate_jti()
-    
+
     data = {}
     if user_id is not None:
         data["sub"] = str(user_id)
@@ -191,14 +191,14 @@ def create_refresh_token(
         data.update(additional_claims)
     data["type"] = "refresh"
     data["jti"] = jti
-    
+
     if not expires_delta:
         expires_delta = timedelta(days=7)
-    
+
     expire = datetime.utcnow() + expires_delta
     data["exp"] = int(expire.timestamp())
     data["iat"] = int(datetime.utcnow().timestamp())
-    
+
     if jwt:
         try:
             to_encode = data.copy()
@@ -206,7 +206,7 @@ def create_refresh_token(
             return encoded_jwt, jti, expire
         except Exception:
             pass
-    
+
     token = simple_encode(data, JWT_SECRET_KEY)
     return token, jti, expire
 
@@ -227,7 +227,7 @@ def decode_token(token: str) -> Optional[dict]:
             return payload
         except Exception:
             pass
-    
+
     return simple_decode(token, JWT_SECRET_KEY)
 
 
@@ -245,11 +245,11 @@ def decode_token_unsafe(token: str) -> Optional[Dict[str, Any]]:
 
 
 def verify_token(
-    token: str,
-    expected_type: str = "access",
-    verify_exp: bool = True,
-    verify_aud: bool = True,
-    verify_iss: bool = True
+        token: str,
+        expected_type: str = "access",
+        verify_exp: bool = True,
+        verify_aud: bool = True,
+        verify_iss: bool = True
 ) -> Tuple[bool, Dict[str, Any], str]:
     """
     验证JWT令牌
@@ -261,7 +261,7 @@ def verify_token(
         payload = decode_token(token)
         if not payload:
             return False, {}, "无效的令牌"
-        
+
         # 不强制检查 type 字段，简化验证
         return True, payload, ""
     except Exception as e:
